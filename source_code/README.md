@@ -2,7 +2,7 @@
 <br>The hierarchy of these VHDL-modules is as follows:
 
 <br>└ top_level.vdl
-<br>    └ control_unit.vhd
-<br>    └ ROM.vhd
-<br>    └ RAM.vhd
-<br>    └ ALU.vhd
+<br>&nbsp;└ control_unit.vhd
+<br>&nbsp;└ ROM.vhd
+<br>&nbsp;└ RAM.vhd
+<br>&nbsp;└ ALU.vhd
