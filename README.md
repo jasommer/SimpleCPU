@@ -6,7 +6,8 @@ A simple VHDL implementation of a general purpose 12 bit CPU for educational pur
 | ------------- |:-------------:| 
 | ISA type      | self-defined RISC | 
 | Pipelining      | no pipelining      | 
-| Data access type      | Load-store      |   
+| Data access type      | Load-store      |
+| Endianness      | Little endian      | 
 | Word size | 12 bit      |
 |Address size | 12 bit      |
 | In-System RAM size | 6 kB       |
