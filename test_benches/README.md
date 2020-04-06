@@ -6,7 +6,10 @@
 <br>control_unit.vhd
 <br>ALU_tb.vhd for explicitly testing the ALU.vhd
 <br>ROM_tb.vhd for explicitly testing the ROM.vhd
-<br><i>the following test benches test the functionality of the entire CPU by loading some simple programs, written in machine code, into it.</i>
+</pre>
+<br><i>the following test benches test the functionality of the entire CPU by loading some simple programs,
+<br>written in machine code, into it.</i>
+<pre class="tab">
 <br>add_tb.vhd       -program for adding 1+1
 <br>counter_tb.vhd   -program of a counter that counts from 0 to 20
 <br>fibonacci_tb.vhd -program that calculates the first 17 fibonacci numbers
