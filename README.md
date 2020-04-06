@@ -1,6 +1,11 @@
 # SimpleCPU
 A simple VHDL implementation of a general purpose 12 bit CPU for educational purposes. 
 
+## Scope
+As the name implies, the goal of this project was to come up with a processor architecture that is as
+simple as possible while still beeing useful. This was achieved by the following design choices:
+- a small instruction set
+
 ## Specifications overview:
 | Type        | Specification           | 
 | ------------- |:-------------:| 
