@@ -2,8 +2,6 @@
 <br>The following test benches have been created:
 
 <pre class="tab">
-<br>top_level.vdl
-<br>control_unit.vhd
 <br>ALU_tb.vhd for explicitly testing the ALU.vhd
 <br>ROM_tb.vhd for explicitly testing the ROM.vhd
 </pre>
