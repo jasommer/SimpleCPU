@@ -27,11 +27,24 @@ simple as possible while still beeing useful. This was achieved by the following
 | ALU operations | logical and signed integer arithmetic      |
 
 ## HDL Synthesis results
+<b>2  4096x12-bit single-port RAMs</b>
+<b>2  Adders/Subtractors</b>
+2  12-bit adder                                        
+1  13-bit addsub
+<b>1  12-bit up counter </b>                                  
+<b>16 Registers</b>
+2  1-bit register
+13 12-bit register                            
+1  13-bit register                           
+1  5-bit register                      
+<b>56 Multiplexers 
+<b>2  Comparators</b>                                          
+<b>2  Xors</b>    
+1 1-bit xor2                           
+1 13-bit xor2
 
-2  4096x12-bit single-port RAMs
-2  Adders/Subtractors                                  
-1  12-bit up counter                                    
-16 Registers                                           
-2  Comparators                                          
-2  Xors                                                 : 
+## Place an Route results on the Spartan 6 xc6slx9 FPGA
+Number of Slice Registers: 189 
+Number of Slice LUTs:      314
+Number of RAMB16BWERs:     6
 
