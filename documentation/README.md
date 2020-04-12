@@ -4,8 +4,7 @@
 
 
 ## ISA
-![Instruction Format](Instruction_Format.png)
-*Instruction format*
+![Instruction Format](Instruction_Format.png?raw=true "Instruction format")
 | Opcode        | Mnemonic      | Explanation      |
 | ------------- |:-------------:| :-------------:| 
 |0	|NOP	|No Operation
