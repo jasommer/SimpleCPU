@@ -78,7 +78,7 @@ begin
 	op2_signed_ext <= resize(signed(op2_in), op2_signed_ext'length);
 	
 	-- assign flags
-	flags_out(0) <= '1' when (res_signed_ext(11) xor res_signed(11)) else '1'; -- overflow flag
+	flags_out(0) <= '0' when (res_signed_ext(11) = res_signed(11)) else '1'; -- overflow flag
 	flags_out(1) <= '1' when (res_signed = x"000") else '0';                   -- zero flag
 	flags_out(2) <= '1' when (op1_in = op2_in) else '0';                       -- equality flag
 	flags_out(3) <= error_state;                                               -- error flag
