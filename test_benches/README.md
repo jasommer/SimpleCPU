@@ -1,5 +1,4 @@
 <b>Test benches for SimpleCPU </b>
-<br>The following test benches have been created:
 <br>The following test benches test the functionality of the entire CPU by loading some simple programs 
 <br>that are written in machine code.
 <pre class="tab">
