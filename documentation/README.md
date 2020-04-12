@@ -28,8 +28,8 @@
 |13	|AND	|OP1 AND OP2                                                                                 | 
 |14	|OR	    |OP1 OR OP2                                                                                 | 
 |15	|XOR	|OP1 XOR OP2                                                                                 | 
-|16	|NAND	|!(OP1 AND OP2)                                                                              | 
-|17	|NOR	|!(OP1 OR OP2)                                                                              | 
+|16	|NAND	|NOT(OP1 AND OP2)                                                                              | 
+|17	|NOR	|NOT(OP1 OR OP2)                                                                              | 
 |18	|INCR	|OP1+1                                                                                   | 
 |19	|DECR	|OP1-1                                                                                   | 
 |1A	|NOT	|NOT OP1                                                                                    | 
