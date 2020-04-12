@@ -3,6 +3,7 @@
 
 <pre class="tab">
 <br> └ top_level.vdl
+<br>&nbsp;   └ reset_bridge.vhd
 <br>&nbsp;   └ control_unit.vhd
 <br>&nbsp;   └ ROM.vhd
 <br>&nbsp;   └ RAM.vhd
