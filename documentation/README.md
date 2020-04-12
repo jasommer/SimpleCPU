@@ -5,6 +5,12 @@
 
 ## ISA
 ![Instruction Format](Instruction_Format.png?raw=true "Instruction format")
+
+<figure>
+  <img src="Instruction_Format.png" alt="ALtText" title="Title" />
+  <figcaption>caption</figcaption>
+</figure>
+
 | Opcode        | Mnemonic      | Explanation      |
 | ------------- |:-------------:| :-------------:| 
 |0	|NOP	|No Operation
