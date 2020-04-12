@@ -20,24 +20,24 @@
 |B	|JR     |Relative jump. Add  7 bit value to instruction counter                                  |
 |C	|JRE	|Relative jump. If OP1 = OP2, add  7 bit value to instruction counter                    |
 |D	|UNDEFINED| N/A	                                                                                 |
-|E	|UNDEFINED| N/A                                                                                   |
-|F	|ADD	|OP1+OP2                                                                                  |
-|10	|SUB	|OP1-OP2                                                                                  |
-|11	|LSFT	|OP1<<1 (arithmetic)                                                                      |
-|12	|RSFT	|OP1<<1 (arithmetic)                                                                      |
-|13	|AND	|OP1&OP2                                                                                  |
-|14	|OR	    |OP1|OP2                                                                                  |
-|15	|XOR	|OP1^OP2                                                                                  |
-|16	|NAND	|!(OP1&OP2)                                                                               |
-|17	|NOR	|!(OP1|OP2)                                                                               |
-|18	|INCR	|OP1+1                                                                                    |
-|19	|DECR	|OP1-1                                                                                    |
-|1A	||NOT	|!OP1                                                                                     |
-|1B	||BGR	|OP1>OP2                                                                                  |
-1C	|ABS	||OP1|                                                                                    |
-1D	|L-LSFT	|OP1<<1 (logical)                                                                         |
-1E	|L-RSFT	|OP1>>1 (logical)                                                                         |
-1F	|HALT	|Stops the program                                                                        |
+|E	|UNDEFINED| N/A                                                                                  | 
+|F	|ADD	|OP1+OP2                                                                                 | 
+|10	|SUB	|OP1-OP2                                                                                 | 
+|11	|LSFT	|OP1<<1 (arithmetic)                                                                     | 
+|12	|RSFT	|OP1<<1 (arithmetic)                                                                     | 
+|13	|AND	|OP1 AND OP2                                                                                 | 
+|14	|OR	    |OP1 OR OP2                                                                                 | 
+|15	|XOR	|OP1 XOR OP2                                                                                 | 
+|16	|NAND	|!(OP1 AND OP2)                                                                              | 
+|17	|NOR	|!(OP1 OR OP2)                                                                              | 
+|18	|INCR	|OP1+1                                                                                   | 
+|19	|DECR	|OP1-1                                                                                   | 
+|1A	||NOT	|NOT OP1                                                                                    | 
+|1B	||BGR	|OP1>OP2                                                                                 | 
+1C	|ABS	|Absolute(OP1)                                                                                   | 
+1D	|L-LSFT	|OP1<<1 (logical)                                                                        | 
+1E	|L-RSFT	|OP1>>1 (logical)                                                                        | 
+1F	|HALT	|Stops the program                                                                       | 
 
 
 ## Functional description
