@@ -1,15 +1,15 @@
 # SimpleCPU documentation
 
 ## Overview
-
-
-## ISA
 <figure>
-  <img src="Instruction_Format.png" alt="Instruction format" title="Instruction format" />
-  <figcaption>Instruction format</figcaption>
+  <img src="block_diagram.png" alt="Block diagram" title="Block diagram" />
+  <figcaption>Block diagram</figcaption>
 </figure>
 <br>
 <br>
+
+
+## ISA
 <figure>
   <img src="Instruction_Format.png" alt="Instruction format" title="Instruction format" />
   <figcaption>Instruction format</figcaption>
