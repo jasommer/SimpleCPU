@@ -1,7 +1,29 @@
 ----------------------------------------------------------------------------------
--- Create Date:    17:19:01 02/25/2020 
--- Description: top level of the CPU design
 --
+--  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+--  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+--  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+--  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+--  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+--  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+--  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 
+--
+-- Copyright (C) 2020 Jan Sommer
+-- Permission to use, copy, modify, and/or distribute this software for any
+-- purpose with or without fee is hereby granted, provided that the above
+-- copyright notice and this permission notice appear in all copies.
+--
+-- Project Name:   SimpleCPU
+-- Description:    top level module that wraps all the functional modules and wires  
+--                 them together. The input port program_enab_in can be set to high in order to program_enab_in
+--                 the instruction ROM that holds the program to be executed. The instruction_in bus is for 
+--                 transmitting the individual instructions to the instruction ROM. The display_out output is just
+--                 for debug purposes (e.g. connecting 3 7-segment displays to it). 
+--                 Note that the input rst_n_in expects an active low reset, but internally the reset is active high.                                
+--
+-- Dependencies:   ROM.vhd, RAM.vhd, ALU.vhd, control_unit.vhd, reset_bridge.vhd
+--
+-- Revision: 1.1
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -13,14 +35,23 @@ entity top_level is
 			word_size  : natural := 12
         );
     port ( 
-		clk_in          : in std_logic;
-        rst_n_in        : in std_logic; -- active low
-		program_enab_in : in std_logic;
-		instruction_in  : in std_logic_vector (addr_size-1 downto 0)
+			clk_in          : in std_logic;
+			rst_n_in        : in std_logic; -- active low
+			program_enab_in : in std_logic;
+			instruction_in  : in std_logic_vector (addr_size-1 downto 0);
+			display_out     : out std_logic_vector (addr_size-1 downto 0)
 	);
 end top_level;
 
 architecture Behavioral of top_level is
+	
+	component reset_bridge
+    port ( 
+			clk_in         : in  std_logic;
+			async_rst_n_in : in  std_logic;
+			sync_rst_out   : out std_logic
+		);
+	end component;
 	
 	component ROM
     port(
@@ -73,12 +104,12 @@ architecture Behavioral of top_level is
 	
 	component ALU
 	port ( 
-			clk_in     : in  std_logic;
-			opcode     : in  std_logic_vector (4 downto 0);
-			op1_in     : in  std_logic_vector (addr_size-1 downto 0);
-			op2_in     : in  std_logic_vector (addr_size-1 downto 0);
-			res_out    : out std_logic_vector (addr_size-1 downto 0);
-			flags_out  : out std_logic_vector (addr_size-1 downto 0)
+		clk_in     : in  std_logic;
+		opcode     : in  std_logic_vector (4 downto 0);
+		op1_in     : in  std_logic_vector (addr_size-1 downto 0);
+		op2_in     : in  std_logic_vector (addr_size-1 downto 0);
+		res_out    : out std_logic_vector (addr_size-1 downto 0);
+		flags_out  : out std_logic_vector (addr_size-1 downto 0)
 	);
 	end component;
 	
@@ -105,15 +136,17 @@ architecture Behavioral of top_level is
 	
 begin
 	
-	RST_BEHAVIOR: process(rst_n_in)
-	begin
-		if(program_enab_in = '0') then 
-			-- hold on reset when programming
-			rst_internal <= not rst_n_in;
-		else
-			rst_internal <= '1';
-		end if;			
-	end process RST_BEHAVIOR;	
+	display_out <= display;
+	
+	--------------------------------------------------------------------------
+	------- reset bridge signals --------------------------------------------
+	--------------------------------------------------------------------------
+	reset_bridge_inst: reset_bridge
+    port map ( 
+		clk_in          => clk_in,
+		async_rst_n_in  => rst_n_in,
+		sync_rst_out    => rst_internal
+	);
 	
 	--------------------------------------------------------------------------
 	------- instruction ROM signals ------------------------------------------
