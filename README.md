@@ -28,18 +28,12 @@ simple as possible while still beeing useful. This was achieved by the following
 
 ## HDL Synthesis results
 2  4096x12-bit single-port RAMs<br/>
-2  Adders/Subtractors<br/>
    2  12-bit adder    <br/>
    1  13-bit addsub<br/>
 1  12-bit up counter<br/>
 17 Registers<br/>
-   2  1-bit register<br/>
-   13 12-bit register<br/>
-   1  13-bit register<br/>
-   1  5-bit register<br/>
 56 Multiplexers <br/>
 2  Comparators <br/>
-2  Xors    <br/>
    1 1-bit xor2<br/>
    1 13-bit xor2<br/>
 <br/>
