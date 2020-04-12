@@ -10,6 +10,12 @@
 </figure>
 <br>
 <br>
+<figure>
+  <img src="Instruction_Format.png" alt="Instruction format" title="Instruction format" />
+  <figcaption>Instruction format</figcaption>
+</figure>
+<br>
+<br>
 
 | Opcode        | Mnemonic      | Explanation      |
 | ------------- |:-------------:| :-------------:| 
