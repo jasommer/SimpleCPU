@@ -4,12 +4,12 @@
 
 
 ## ISA
-![Instruction Format](Instruction_Format.png?raw=true "Instruction format")
-
 <figure>
-  <img src="Instruction_Format.png" alt="ALtText" title="Title" />
-  <figcaption>caption</figcaption>
+  <img src="Instruction_Format.png" alt="Instruction format" title="Instruction format" />
+  <figcaption>Instruction format</figcaption>
 </figure>
+<br>
+<br>
 
 | Opcode        | Mnemonic      | Explanation      |
 | ------------- |:-------------:| :-------------:| 
