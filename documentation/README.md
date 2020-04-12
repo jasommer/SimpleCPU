@@ -14,8 +14,8 @@
 | Opcode        | Mnemonic      | Explanation      |
 | ------------- |:-------------:| :-------------:| 
 |0	|NOP	|No Operation
-|1	|RS-Vf	|Save 7 bit value to RAM to follow-up address                                            |
-|2	|RS-Af	|Save to 7 bit RAM address the follow-up value                                           |
+|1	|RS-Vf	|Save 7 bit value to RAM at follow-up address                                            |
+|2	|RS-Af	|Save the follow-up value to 7 bit RAM address                                            |
 |3	|RS-ff	|Save 12 bit follow-up value to 12-bit follow-up address                                 |
 |4	|RC-Af	|Copy value from 7 bit address1 to follow up address2                                    |
 |5	|RC-fA	|Copy value from follow-up address1 to 7 bit address2                                    |
