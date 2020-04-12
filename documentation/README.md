@@ -32,12 +32,12 @@
 |17	|NOR	|!(OP1 OR OP2)                                                                              | 
 |18	|INCR	|OP1+1                                                                                   | 
 |19	|DECR	|OP1-1                                                                                   | 
-|1A	||NOT	|NOT OP1                                                                                    | 
-|1B	||BGR	|OP1>OP2                                                                                 | 
+|1A	|NOT	|NOT OP1                                                                                    | 
+|1B	|BGR	|OP1>OP2                                                                                 | 
 1C	|ABS	|Absolute(OP1)                                                                                   | 
 1D	|L-LSFT	|OP1<<1 (logical)                                                                        | 
 1E	|L-RSFT	|OP1>>1 (logical)                                                                        | 
-1F	|HALT	|Stops the program                                                                       | 
+1F	|HALT	|Stops the program                                                                       |
 
 
 ## Functional description
