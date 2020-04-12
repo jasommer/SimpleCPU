@@ -202,7 +202,7 @@ begin
 							
 						elsif opcode = "01011" then -- JR
 							report "JR" severity note;
-							instruction_cntr_run <= instruction_cntr_run + payload;
+							instruction_cntr_run <= instruction_cntr_run + unsigned(payload);
 							control_unit_state   <= EXECUTE_S1;
 							
 						elsif opcode = "01100" then -- JRE
@@ -210,7 +210,7 @@ begin
 							
 							if(alu_flags_in(2) = '1') then -- check the alu equality flag
 								report "   -jumping" severity note;
-								instruction_cntr_run <= instruction_cntr_run + payload;
+								instruction_cntr_run <= instruction_cntr_run + unsigned(payload);
 								control_unit_state   <= EXECUTE_S1;
 							else
 								report "   -not jumping" severity note;
@@ -362,16 +362,16 @@ begin
 							report "   -jumping to address " & integer'image(to_integer(unsigned(instr_data_in)));
 							instruction_cntr_run <= unsigned(instr_data_in);
 							control_unit_state   <= EXECUTE_S2;
-						
-						end if;
-						
+							
 						elsif opcode = "01011" then -- JR
-							report "   -jumping to address " & integer'image(to_integer(unsigned(instruction_cntr_run + payload)));
+							report "   -jumping to address " & integer'image(to_integer(instruction_cntr_run + unsigned(payload)));
 							control_unit_state <= FETCH1;
 							
 						elsif opcode = "01100" then -- JRE
-							report "   -jumping to address " & integer'image(to_integer(unsigned(instruction_cntr_run + payload)));
+							report "   -jumping to address " & integer'image(to_integer(instruction_cntr_run + unsigned(payload)));
 							control_unit_state <= FETCH1;
+						
+						end if;
 						
 					when EXECUTE_S2 =>
 												
