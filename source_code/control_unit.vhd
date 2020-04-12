@@ -98,7 +98,8 @@ architecture Behavioral of control_unit is
 	
 	signal opcode                   : std_logic_vector (4 downto 0) := (others => '0');
 	signal payload                  : std_logic_vector (addr_size-1 downto 0) := (others => '0');
-		
+	
+	signal rst_internal             : std_logic;
 	signal follow_up_reg1           : std_logic_vector (addr_size-1 downto 0) := (others => '0');
 	
 	type state_type is (FETCH1, DECODE, EXECUTE_S1, EXECUTE_S2, EXECUTE_S3, HALT);  
@@ -111,9 +112,9 @@ begin
 	opcode                   <= instruction_reg(addr_size-1 downto addr_size-5); -- in a 12 bit instruction bits 11 to 7 define the opcode
 	payload                  <= (payload'left downto 7 => '0') & instruction_reg(addr_size-6 downto 0); -- bits 6 to 0 hold the payload
 		
-	CONTROL_UNIT_FSM_BEHAV: process(clk_in, rst_in)
+	CONTROL_UNIT_FSM_BEHAV: process(clk_in, rst_internal)
 	begin 
-		if(rst_in = '1') then
+		if(rst_internal = '1') then
 			instruction_cntr_run <= (others => '0');
 			ram_wr_enab_out      <= '0';
 			control_unit_state   <= FETCH1;
@@ -423,6 +424,17 @@ begin
 		
 		end if;
 	end process INSTRUCTION_CNTR_PRGRM_BEHAV;
+	
+	
+	RST_BEHAV: process(rst_in, program_enab_in)
+	begin
+		if(program_enab_in = '0') then 
+			-- hold on reset when programming
+			rst_internal <= rst_in;
+		else
+			rst_internal <= '1';
+		end if;			
+	end process RST_BEHAV;
 	
 end Behavioral;
 
