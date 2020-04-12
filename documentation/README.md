@@ -4,6 +4,8 @@
 
 
 ## ISA
+![Instruction Format](Instruction_Format.png)
+Format: ![Alt Text](url)
 | Opcode        | Mnemonic      | Explanation      |
 | ------------- |:-------------:| :-------------:| 
 |0	|NOP	|No Operation
