@@ -71,6 +71,7 @@ entity control_unit is
 			clk_in             : in   std_logic;
             rst_in             : in   std_logic;
 			program_enab_in    : in   std_logic; -- set to 1 to program the instruction ROM
+			stack_pointer_in   : in   std_logic_vector (addr_size-1 downto 0);
 			
 			-- Instruction ROM control lines
             instr_rom_addr_out : out  std_logic_vector (addr_size-1 downto 0);
@@ -83,7 +84,6 @@ entity control_unit is
             ram_wr_enab_out    : out  std_logic; -- write enable
 			
 			-- ALU control lines
-			alu_opcode_out     : out std_logic_vector (4 downto 0);
 			alu_flags_in       : in  std_logic_vector (addr_size-1 downto 0)
 		);
 end control_unit;
@@ -95,14 +95,16 @@ architecture Behavioral of control_unit is
 	signal instruction_cntr_run_new : unsigned (addr_size-1 downto 0) := (others => '0');
 	signal instruction_cntr_out     : unsigned (addr_size-1 downto 0) := (others => '0');
 	signal instruction_reg          : std_logic_vector (addr_size-1 downto 0) := (others => '0');
+	signal alu_opcode_out           : std_logic_vector (addr_size-1 downto 0) := (others => '0');
 	
 	signal opcode                   : std_logic_vector (4 downto 0) := (others => '0');
 	signal payload                  : std_logic_vector (addr_size-1 downto 0) := (others => '0');
 	
 	signal rst_internal             : std_logic;
 	signal follow_up_reg1           : std_logic_vector (addr_size-1 downto 0) := (others => '0');
+	signal follow_up_reg2           : std_logic_vector (addr_size-1 downto 0) := (others => '0');
 	
-	type state_type is (FETCH1, DECODE, EXECUTE_S1, EXECUTE_S2, EXECUTE_S3, HALT);  
+	type state_type is (FETCH1, DECODE, EXECUTE_S1, EXECUTE_S2, EXECUTE_S3, EXECUTE_S4, EXECUTE_S5, HALT);  
 	signal control_unit_state       : state_type := FETCH1;
 		
 begin
@@ -120,7 +122,7 @@ begin
 			control_unit_state   <= FETCH1;
 		else
 			if rising_edge(clk_in) then 
-			
+				
 				case control_unit_state is
 				
 					when FETCH1 =>
@@ -150,33 +152,68 @@ begin
 							instruction_cntr_run <= instruction_cntr_run_new;
 							control_unit_state <= EXECUTE_S1;
 						
-						elsif opcode = "00100" then -- RC-Af
+						elsif opcode = "00100" then -- RS-Vif
+							report "RS-Vif" severity note;
+							instruction_cntr_run <= instruction_cntr_run_new;
+							control_unit_state <= EXECUTE_S1;
+							
+						elsif opcode = "00101" then -- RS-iAf
+							report "RS-iAf" severity note;
+							instruction_cntr_run <= instruction_cntr_run_new;
+							ram_addr_out         <= payload;
+							control_unit_state   <= EXECUTE_S1;	
+						
+						elsif opcode = "00110" then -- RS-iff
+							report "RS-iff" severity note;
+							instruction_cntr_run <= instruction_cntr_run_new;
+							control_unit_state <= EXECUTE_S1;
+						
+						elsif opcode = "00111" then -- RC-Af
 							report "RC-Af" severity note;
 							ram_addr_out <= payload;
 							control_unit_state <= EXECUTE_S1;
-							
-						elsif opcode = "00101" then -- RC-fA
+						
+						elsif opcode = "01000" then -- RC-fA
 							report "RC-fA" severity note;
 							instruction_cntr_run <= instruction_cntr_run_new;
-							control_unit_state <= EXECUTE_S1;	
+							control_unit_state <= EXECUTE_S1;
 						
-						elsif opcode = "00110" then -- RC-ff
+						elsif opcode = "01001" then -- RC-ff
 							report "RC-ff" severity note;
 							instruction_cntr_run <= instruction_cntr_run_new;
 							control_unit_state <= EXECUTE_S1;
 						
-						elsif opcode = "00111" then -- JP
+						elsif opcode = "01010" then -- RC-iAif
+							report "RC-iAif" severity note;
+							report "   -accessing pointer at address " & integer'image(to_integer(unsigned(payload)));
+							ram_addr_out <= payload;
+							instruction_cntr_run <= instruction_cntr_run_new;
+							control_unit_state <= EXECUTE_S1;
+							
+						elsif opcode = "01011" then -- RC-ifiA
+							report "RC-ifiA" severity note;
+							report "   -accessing pointer at address " & integer'image(to_integer(unsigned(payload)));
+							ram_addr_out <= payload; -- get the pointer at address A	
+							instruction_cntr_run <= instruction_cntr_run_new;
+							control_unit_state <= EXECUTE_S1;
+							
+						elsif opcode = "01100" then -- RC-ifif
+							report "RC-ifif" severity note;
+							instruction_cntr_run <= instruction_cntr_run_new;
+							control_unit_state <= EXECUTE_S1;
+						
+						elsif opcode = "01101" then -- JP
 							report "JP" severity note;
 							report "   -jumping to address " & integer'image(to_integer(unsigned(payload)));
 							instruction_cntr_run <= unsigned(payload);
 							control_unit_state   <= EXECUTE_S1;
-							
-						elsif opcode = "01000" then -- JP-f
+						
+						elsif opcode = "01110" then -- JP-f
 							report "JP-f" severity note;
 							instruction_cntr_run <= instruction_cntr_run_new;
-							control_unit_state   <= EXECUTE_S1;	
+							control_unit_state   <= EXECUTE_S1;
 						
-						elsif opcode = "01001" then -- JPE
+						elsif opcode = "01111" then -- JPE
 							report "JPE" severity note;
 							
 							if(alu_flags_in(2) = '1') then -- check the alu equality flag
@@ -186,9 +223,9 @@ begin
 							else
 								report "   -not jumping" severity note;
 								control_unit_state   <= FETCH1;
-							end if;
-							
-						elsif opcode = "01010" then -- JPE-f
+							end if;	
+						
+						elsif opcode = "10000" then -- JPE-f
 							report "JPE-f" severity note;
 							
 							if(alu_flags_in(2) = '1') then -- check the alu equality flag
@@ -199,13 +236,13 @@ begin
 								report "   -not jumping" severity note;
 								control_unit_state   <= EXECUTE_S1;
 							end if;
-							
-						elsif opcode = "01011" then -- JR
+						
+						elsif opcode = "10001" then -- JR
 							report "JR" severity note;
 							instruction_cntr_run <= instruction_cntr_run + unsigned(payload);
 							control_unit_state   <= EXECUTE_S1;
 							
-						elsif opcode = "01100" then -- JRE
+						elsif opcode = "10010" then -- JRE
 							report "JRE" severity note;
 							
 							if(alu_flags_in(2) = '1') then -- check the alu equality flag
@@ -217,95 +254,45 @@ begin
 								control_unit_state   <= EXECUTE_S1;
 							end if;
 						
-						elsif opcode = "01111" then -- ADD
-							report "ADD" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "10000" then -- SUB
-							report "SUB" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-						
-						elsif opcode = "10001" then -- LSFT
-							report "LSFT" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "10010" then -- RSFT
-							report "RSFT" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "10011" then -- AND
-							report "AND" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "10100" then -- OR
-							report "OR" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "10101" then -- XOR
-							report "XOR" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "10110" then -- NAND
-							report "NAND" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "10111" then -- NOR
-							report "NOR" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;	
-						
-						elsif opcode = "11000" then -- INCR
-							report "INCR" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
+						elsif opcode = "11011" then -- SSR
+							report "SSR" severity note;
+							report "   -starting subroutine at address " & integer'image(to_integer(unsigned(payload))) severity note;	
+							report "   -set return address to " & integer'image(to_integer(unsigned(instruction_cntr_run))) severity note;
+							instruction_cntr_run <= unsigned(payload);
+							ram_addr_out <= std_logic_vector(unsigned(stack_pointer_in) - 1);
+							ram_data_out <= std_logic_vector(instruction_cntr_run);
+							ram_wr_enab_out <= '1';
+							control_unit_state   <= EXECUTE_S1;	
 							
-						elsif opcode = "11001" then -- DECR
-							report "DECR" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "11010" then	-- NOT	
-							report "NOT" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
+						elsif opcode = "11100" then -- SSR-f
+							report "SSR-f" severity note;							
+							report "   -set return address to " & integer'image(to_integer(unsigned(instruction_cntr_run))) severity note;
+							ram_addr_out <= std_logic_vector(unsigned(stack_pointer_in) - 1);
+							ram_data_out <= std_logic_vector(instruction_cntr_run);
+							ram_wr_enab_out <= '1';
+							instruction_cntr_run <= instruction_cntr_run_new;
+							control_unit_state   <= EXECUTE_S1;
 							
-						elsif opcode = "11010" then	-- NOT	
-							report "NOT" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "11011" then	-- BGR	
-							report "BGR" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "11100" then	-- ABS	
-							report "ABS" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "11101" then	-- L-LSFT	
-							report "L-LSFT" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;
-
-						elsif opcode = "11110" then	-- R-LSFT	
-							report "R-LSFT" severity note;
-							alu_opcode_out <= opcode;
-							control_unit_state <= FETCH1;		
+						elsif opcode = "11101" then -- SSRR
+							report "SSRR" severity note;
+							report "   -starting subroutine at address " & integer'image(to_integer(unsigned(payload) + instruction_cntr_run)) severity note;	
+							report "   -set return address to " & integer'image(to_integer(unsigned(instruction_cntr_run))) severity note;
+							instruction_cntr_run <= unsigned(payload) + instruction_cntr_run;
+							ram_addr_out <= std_logic_vector(unsigned(stack_pointer_in) - 1);
+							ram_data_out <= std_logic_vector(instruction_cntr_run);
+							ram_wr_enab_out <= '1';
+							control_unit_state   <= EXECUTE_S1;
 							
+						elsif opcode = "11110" then -- ESR
+							report "ESR" severity note;
+							report "   -popping the return address from the stack at pointer address " & integer'image(to_integer(unsigned(stack_pointer_in))) severity note;
+							ram_addr_out <= stack_pointer_in;
+							control_unit_state   <= EXECUTE_S1;	
+														
 						elsif opcode = "11111" then -- HALT
 							report "HALT" severity note;
 							control_unit_state <= HALT;
-							
+						
 						else 
 							report "Undefined opcode!" severity warning;
 							control_unit_state <= HALT;
@@ -333,88 +320,260 @@ begin
 							instruction_cntr_run <= instruction_cntr_run_new;
 							control_unit_state <= EXECUTE_S2;
 							
-						elsif opcode = "00100" then -- RC-Af
+						elsif opcode = "00100" then -- RS-Vif
+						    report "   -accessing pointer at address " & integer'image(to_integer(unsigned(instr_data_in)));
+							ram_addr_out       <= instr_data_in;
+							control_unit_state <= EXECUTE_S2;
+						
+						elsif opcode = "00101" then -- RS-iAf
+							report "   -accessing pointer at address " & integer'image(to_integer(unsigned(payload)));
+							follow_up_reg1 <= instr_data_in;
+							control_unit_state <= EXECUTE_S2;
+							
+						elsif opcode = "00110" then -- RS-iff
+							report "   -accessing pointer at address " & integer'image(to_integer(unsigned(instr_data_in))); 
+							ram_addr_out <= instr_data_in;
+							instruction_cntr_run <= instruction_cntr_run_new;
+							control_unit_state <= EXECUTE_S2;
+							
+						elsif opcode = "00111" then -- RC-Af
 							instruction_cntr_run <= instruction_cntr_run_new;
 							control_unit_state <= EXECUTE_S2;
 						
-						elsif opcode = "00101" then -- RC-fA
+						elsif opcode = "01000" then -- RC-fA
 							ram_addr_out <= instr_data_in;
 							control_unit_state <= EXECUTE_S2;
-							
-						elsif opcode = "00110" then -- RC-ff
+						
+						elsif opcode = "01001" then -- RC-ff
 							report "   -copy from address " & integer'image(to_integer(unsigned(instr_data_in))); 
 							ram_addr_out <= instr_data_in;
 							instruction_cntr_run <= instruction_cntr_run_new;
 							control_unit_state <= EXECUTE_S2;
-							
-						elsif opcode = "00111" then -- JP
+						
+						elsif opcode = "01010" then -- RC-iAif
+							report "   -accessing pointer at address " & integer'image(to_integer(unsigned(instr_data_in)));
+							ram_addr_out <= instr_data_in;
+							control_unit_state <= EXECUTE_S2;
+						
+						elsif opcode = "01011" then -- RC-ifiA
+							report "   -accessing pointer at address " & integer'image(to_integer(unsigned(instr_data_in)));
+							ram_addr_out <= instr_data_in;
+							control_unit_state <= EXECUTE_S2;
+						
+						elsif opcode = "01100" then -- RC-ifif	
+							report "   -accessing pointer at address " & integer'image(to_integer(unsigned(instr_data_in)));
+							instruction_cntr_run <= instruction_cntr_run_new;
+							ram_addr_out <= instr_data_in;
+							control_unit_state <= EXECUTE_S2;
+						
+						elsif opcode = "01101" then -- JP
 							control_unit_state <= FETCH1;
-							
-						elsif opcode = "01000" then -- JP-f
+						
+						elsif opcode = "01110" then -- JP-f
 							report "   -jumping to address " & integer'image(to_integer(unsigned(instr_data_in)));
 							instruction_cntr_run <= unsigned(instr_data_in);
 							control_unit_state   <= EXECUTE_S2;
 						
-						elsif opcode = "01001" then -- JPE
+						elsif opcode = "01111" then -- JPE
 							control_unit_state <= FETCH1;
 						
-						elsif opcode = "01010" then -- JPE-f
+						elsif opcode = "10000" then -- JPE-f
 							report "   -jumping to address " & integer'image(to_integer(unsigned(instr_data_in)));
 							instruction_cntr_run <= unsigned(instr_data_in);
 							control_unit_state   <= EXECUTE_S2;
-							
-						elsif opcode = "01011" then -- JR
-							report "   -jumping to address " & integer'image(to_integer(instruction_cntr_run + unsigned(payload)));
-							control_unit_state <= FETCH1;
-							
-						elsif opcode = "01100" then -- JRE
+						
+						elsif opcode = "10001" then -- JR
 							report "   -jumping to address " & integer'image(to_integer(instruction_cntr_run + unsigned(payload)));
 							control_unit_state <= FETCH1;
 						
+						elsif opcode = "10010" then -- JRE
+							report "   -jumping to address " & integer'image(to_integer(instruction_cntr_run + unsigned(payload)));
+							control_unit_state <= FETCH1;
+						
+						elsif opcode = "11011" then -- SSR
+							report "   -update the stack pointer to " & integer'image(to_integer(unsigned(stack_pointer_in) - 1)) severity note;
+							ram_addr_out <= x"FFF";
+							ram_data_out <= std_logic_vector(unsigned(stack_pointer_in) - 1);
+							ram_wr_enab_out <= '1';
+							control_unit_state   <= FETCH1;	
+							
+						elsif opcode = "11100" then -- SSR-f
+							report "   -update the stack pointer to " & integer'image(to_integer(unsigned(stack_pointer_in) - 1)) severity note;
+							ram_addr_out <= x"FFF";
+							ram_data_out <= std_logic_vector(unsigned(stack_pointer_in) - 1);
+							ram_wr_enab_out <= '1';
+							
+							report "   -starting subroutine at address " & integer'image(to_integer(unsigned(instr_data_in))) severity note;
+							instruction_cntr_run <= unsigned(instr_data_in);							
+							control_unit_state   <= EXECUTE_S2;		
+						
+						elsif opcode = "11101" then -- SSRR
+							report "   -update the stack pointer to " & integer'image(to_integer(unsigned(stack_pointer_in) - 1)) severity note;
+							ram_addr_out <= x"FFF";
+							ram_data_out <= std_logic_vector(unsigned(stack_pointer_in) - 1);
+							ram_wr_enab_out <= '1';
+							control_unit_state   <= FETCH1;
+							
+						elsif opcode = "11110" then -- ESR
+							report "   -update the stack pointer to " & integer'image(to_integer(unsigned(stack_pointer_in) + 1)) severity note;
+							ram_addr_out <= x"FFF";
+							ram_data_out <= std_logic_vector(unsigned(stack_pointer_in) + 1);
+							ram_wr_enab_out <= '1';
+							control_unit_state <= EXECUTE_S2;
+							
 						end if;
 						
 					when EXECUTE_S2 =>
 												
 						if    opcode = "00011" then -- RS-ff
-							report "   -save value " & integer'image(to_integer(unsigned(follow_up_reg1))) & " to address " & integer'image(to_integer(unsigned(instr_data_in)));
-							ram_addr_out <= instr_data_in;
-							ram_data_out <= follow_up_reg1;
+							report "   -save value " & integer'image(to_integer(unsigned(instr_data_in))) & " to address " & integer'image(to_integer(unsigned(follow_up_reg1)));
+							ram_addr_out <= follow_up_reg1;
+							ram_data_out <= instr_data_in;
 							ram_wr_enab_out <= '1';
 							control_unit_state <= FETCH1;
 							
-						elsif opcode = "00100" then -- RC-Af
+						elsif opcode = "00100" then -- RS-Vif
+							control_unit_state <= EXECUTE_S3;
+							
+						elsif opcode = "00101" then -- RS-iAf
+							report "   -save value " & integer'image(to_integer(unsigned(follow_up_reg1))) & " to address " & integer'image(to_integer(unsigned(instr_data_in)));
+							ram_addr_out <= ram_data_in;
+							ram_data_out <= follow_up_reg1;
+							ram_wr_enab_out <= '1';
+							control_unit_state <= FETCH1;
+						
+						elsif opcode = "00110" then -- RS-iff
+							report "   -save value " & integer'image(to_integer(unsigned(instr_data_in))) & " to address " & integer'image(to_integer(unsigned(ram_data_in)));
+							ram_addr_out <= ram_data_in;
+							ram_data_out <= instr_data_in;
+							ram_wr_enab_out <= '1';
+							control_unit_state <= FETCH1;
+						
+						elsif opcode = "00111" then -- RC-Af
 							report "   -copy from address " & integer'image(to_integer(unsigned(payload))) & " to address " & integer'image(to_integer(unsigned(instr_data_in)));
 							ram_addr_out <= instr_data_in;
 							ram_data_out <= ram_data_in;
 							ram_wr_enab_out <= '1';
 							control_unit_state <= FETCH1;
 						
-						elsif opcode = "00101" then -- RC-fA
+						elsif opcode = "01000" then -- RC-fA
+							-- wait for ram to respond
+							control_unit_state <= EXECUTE_S3;
+						
+						elsif opcode = "01001" then -- RC-ff
+							report "   -to address " & integer'image(to_integer(unsigned(instr_data_in)));
+							ram_addr_out <= instr_data_in;
+							control_unit_state <= EXECUTE_S3;
+						
+						elsif opcode = "01010" then -- RC-iAif		
+							ram_addr_out <= ram_data_in;
+							control_unit_state <= EXECUTE_S3;
+						
+						elsif opcode = "01011" then -- RC-ifiA	
+							follow_up_reg1 <= ram_data_in; -- save the address to copy to
+							control_unit_state <= EXECUTE_S3;
+						
+						elsif opcode = "01100" then -- RC-ifif
+							report "   -accessing pointer at address " & integer'image(to_integer(unsigned(instr_data_in)));
+							ram_addr_out <= instr_data_in;
+							control_unit_state <= EXECUTE_S3;
+							
+						elsif opcode = "01110" then -- JP-f
+							control_unit_state <= FETCH1;	
+						
+						elsif opcode = "10000" then -- JPE-f	
+							control_unit_state <= FETCH1;
+						
+						elsif opcode = "11100" then -- SSR-f
+							ram_wr_enab_out <= '0';
+							control_unit_state <= FETCH1;
+							
+						elsif opcode = "11110" then -- ESR
+							report "   -escaping from subroutine and continue at address " & integer'image(to_integer(unsigned(ram_data_in))) severity note;
+							ram_wr_enab_out <= '0';
+							instruction_cntr_run <= unsigned(ram_data_in);
+							control_unit_state <= EXECUTE_S3;
+							
+						end if;
+						
+					when EXECUTE_S3 =>
+						
+						if    opcode = "00100" then -- RS-Vif
+						
+							report "   -save value " & integer'image(to_integer(unsigned(payload))) & " to address " & integer'image(to_integer(unsigned(ram_data_in)));
+							ram_addr_out <= ram_data_in;
+							ram_data_out <= payload;
+							ram_wr_enab_out <= '1';
+							control_unit_state <= FETCH1;
+						
+						elsif opcode = "01000" then -- RC-fA
 							report "   -copy from address " & integer'image(to_integer(unsigned(instr_data_in))) & " to address " & integer'image(to_integer(unsigned(payload)));
 							ram_addr_out <= payload;
 							ram_data_out <= ram_data_in;
 							ram_wr_enab_out <= '1';
 							control_unit_state <= FETCH1;
 						
-						elsif opcode = "00110" then -- RC-ff
-							report "    to address " & integer'image(to_integer(unsigned(instr_data_in)));
-							ram_addr_out <= instr_data_in;
+						elsif opcode = "01001" then -- RC-ff
+							ram_data_out <= ram_data_in;
+							ram_wr_enab_out <= '1';
+							control_unit_state <= FETCH1;
+							
+						elsif opcode = "01010" then -- RC-iAif	
+							follow_up_reg1 <= ram_data_in; -- save the destination address
+							ram_addr_out <= ram_data_in;
+							control_unit_state <= EXECUTE_S4;	
+						
+						elsif opcode = "01011" then -- RC-ifiA
+							follow_up_reg2 <= ram_data_in; -- save the address to copy from
+							ram_addr_out <= ram_data_in;
+							control_unit_state <= EXECUTE_S4;
+						
+						elsif opcode = "01100" then -- RC-ifif
+							follow_up_reg1 <= ram_data_in; -- save the address to copy from
+							ram_addr_out <= ram_data_in;
+							control_unit_state <= EXECUTE_S4;
+							
+						elsif opcode = "11110" then -- ESR
+							control_unit_state <= FETCH1;
+						
+						end if;
+					
+					when EXECUTE_S4 =>
+						
+						if    opcode = "01011" then -- RC-ifiA
+							-- wait for the RAM to respond withe value at address follow_up_reg2
+							control_unit_state <= EXECUTE_S5;
+						
+						elsif opcode = "01010" then -- RC-iAif	
+							report "   -copy the value " & integer'image(to_integer(unsigned(ram_data_in))) & " to address " & integer'image(to_integer(unsigned(follow_up_reg1)));
+							ram_addr_out <= follow_up_reg1;
+							ram_data_out <= ram_data_in;
+							ram_wr_enab_out <= '1';
+							control_unit_state <= FETCH1;
+							
+						elsif opcode = "01100" then -- RC-ifif
+							follow_up_reg2 <= ram_data_in; -- save the address to copy to
+							control_unit_state <= EXECUTE_S5;
+							
+						end if;
+					
+					when EXECUTE_S5 =>		
+						
+						if    opcode = "01011" then -- RC-ifiA
+							report "   -copy from address " & integer'image(to_integer(unsigned(follow_up_reg2))) & " to address " & integer'image(to_integer(unsigned(follow_up_reg1)));
+							ram_addr_out <= follow_up_reg1;
 							ram_data_out <= ram_data_in;
 							ram_wr_enab_out <= '1';
 							control_unit_state <= FETCH1;
 						
-						elsif opcode = "01000" then -- JP-f
+						elsif opcode = "01100" then -- RC-ifif
+							report "   -copy from address " & integer'image(to_integer(unsigned(follow_up_reg1))) & " to address " & integer'image(to_integer(unsigned(follow_up_reg2)));
+							ram_addr_out <= follow_up_reg2;
+							ram_data_out <= ram_data_in;
+							ram_wr_enab_out <= '1';
 							control_unit_state <= FETCH1;
-							
-						elsif opcode = "01010" then -- JPE-f	
-							control_unit_state <= FETCH1;
-							
-						end if;
 						
-					when EXECUTE_S3 =>
-						if    opcode = "00011" then -- RS-ff
-							control_unit_state <= FETCH1;
-						end if;	
+						end if;
 						
 					when HALT =>
 						-- Do nothing, wait for reset
@@ -450,7 +609,6 @@ begin
 		end if;
 	end process INSTRUCTION_CNTR_PRGRM_BEHAV;
 	
-	
 	RST_BEHAV: process(rst_in, program_enab_in)
 	begin
 		if(program_enab_in = '0') then 
@@ -462,4 +620,5 @@ begin
 	end process RST_BEHAV;
 	
 end Behavioral;
+
 

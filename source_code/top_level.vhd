@@ -65,18 +65,20 @@ architecture Behavioral of top_level is
 	
 	component RAM
     port(
-		clk_in       : in  std_logic;
-		wr_enab_in   : in  std_logic;
-		addr_in      : in  std_logic_vector(addr_size-1 downto 0);
-		data_in      : in  std_logic_vector(addr_size-1 downto 0);
-		data_out     : out std_logic_vector(addr_size-1 downto 0);
-		display_out  : out std_logic_vector (word_size-1 downto 0);
-
+		clk_in            : in  std_logic;
+		wr_enab_in        : in  std_logic;
+		addr_in           : in  std_logic_vector (addr_size-1 downto 0);
+		data_in           : in  std_logic_vector (word_size-1 downto 0);
+		data_out          : out std_logic_vector (word_size-1 downto 0);
+		display_out       : out std_logic_vector (word_size-1 downto 0);
+		stack_pointer_out : out std_logic_vector (word_size-1 downto 0);
+		
 		-- ALU bus lines
-		alu_op1_out  : out std_logic_vector (word_size-1 downto 0);
-		alu_op2_out  : out std_logic_vector (word_size-1 downto 0);
-		alu_flags_in : in  std_logic_vector (word_size-1 downto 0);
-		alu_res_in   : in  std_logic_vector (word_size-1 downto 0)
+		alu_op1_out       : out std_logic_vector (word_size-1 downto 0);
+		alu_op2_out       : out std_logic_vector (word_size-1 downto 0);
+		alu_opcode_out    : out std_logic_vector (word_size-1 downto 0);
+		alu_flags_in      : in  std_logic_vector (word_size-1 downto 0);
+		alu_res_in        : in  std_logic_vector (word_size-1 downto 0)
     );
     end component;
 	
@@ -85,6 +87,7 @@ architecture Behavioral of top_level is
 		clk_in             : in   std_logic;
 		rst_in             : in   std_logic;
 		program_enab_in    : in   std_logic;
+		stack_pointer_in   : in   std_logic_vector (addr_size-1 downto 0);
 		
 		-- Instruction ROM control lines
 		instr_rom_addr_out : out  std_logic_vector (addr_size-1 downto 0);
@@ -97,7 +100,6 @@ architecture Behavioral of top_level is
 		ram_wr_enab_out    : out  std_logic;
 		
 		-- ALU control lines
-		alu_opcode_out     : out std_logic_vector (4 downto 0);
 		alu_flags_in       : in  std_logic_vector (addr_size-1 downto 0)
 	);
 	end component;
@@ -105,7 +107,7 @@ architecture Behavioral of top_level is
 	component ALU
 	port ( 
 		clk_in     : in  std_logic;
-		opcode     : in  std_logic_vector (4 downto 0);
+		opcode     : in  std_logic_vector (addr_size-1 downto 0);
 		op1_in     : in  std_logic_vector (addr_size-1 downto 0);
 		op2_in     : in  std_logic_vector (addr_size-1 downto 0);
 		res_out    : out std_logic_vector (addr_size-1 downto 0);
@@ -113,26 +115,27 @@ architecture Behavioral of top_level is
 	);
 	end component;
 	
-	signal rst_internal : std_logic;
+	signal rst_internal  : std_logic;
 	
 	-- instruction ROM bus signals
-	signal rom_addr     : std_logic_vector(addr_size-1 downto 0);
-	signal rom_data_out : std_logic_vector(addr_size-1 downto 0);
+	signal rom_addr      : std_logic_vector(addr_size-1 downto 0);
+	signal rom_data_out  : std_logic_vector(addr_size-1 downto 0);
 	
 	-- RAM signals
-	signal ram_addr     : std_logic_vector(addr_size-1 downto 0);
-	signal ram_data_in  : std_logic_vector(addr_size-1 downto 0);  
-	signal ram_data_out : std_logic_vector(addr_size-1 downto 0);
-	signal ram_wr_enab  : std_logic;
+	signal ram_addr      : std_logic_vector(addr_size-1 downto 0);
+	signal ram_data_in   : std_logic_vector(addr_size-1 downto 0);  
+	signal ram_data_out  : std_logic_vector(addr_size-1 downto 0);
+	signal ram_wr_enab   : std_logic;
 	
 	-- ALU signals
-	signal alu_op1      : std_logic_vector(addr_size-1 downto 0);
-	signal alu_op2      : std_logic_vector(addr_size-1 downto 0);
-	signal alu_flags    : std_logic_vector(addr_size-1 downto 0);
-	signal alu_res      : std_logic_vector(addr_size-1 downto 0);
-	signal alu_opcode   : std_logic_vector(4 downto 0);
+	signal alu_op1       : std_logic_vector(addr_size-1 downto 0);
+	signal alu_op2       : std_logic_vector(addr_size-1 downto 0);
+	signal alu_flags     : std_logic_vector(addr_size-1 downto 0);
+	signal alu_res       : std_logic_vector(addr_size-1 downto 0);
+	signal alu_opcode    : std_logic_vector(addr_size-1 downto 0);
 	
-	signal display      : std_logic_vector(addr_size-1 downto 0);
+	signal display       : std_logic_vector(addr_size-1 downto 0);
+	signal stack_pointer : std_logic_vector(addr_size-1 downto 0);
 	
 begin
 	
@@ -165,18 +168,20 @@ begin
 	--------------------------------------------------------------------------
 	RAM_inst: RAM 
 	 port map (
-          clk_in       => clk_in,
-          wr_enab_in   => ram_wr_enab,
-          addr_in      => ram_addr,
-          data_in      => ram_data_in,
-          data_out     => ram_data_out,
-		  display_out  => display,
-		  
-		  -- ALU lines
-		  alu_op1_out  => alu_op1,  
-		  alu_op2_out  => alu_op2,  
-		  alu_flags_in => alu_flags,
-		  alu_res_in   => alu_res 
+          clk_in            => clk_in,
+          wr_enab_in        => ram_wr_enab,
+          addr_in           => ram_addr,
+          data_in           => ram_data_in,
+          data_out          => ram_data_out,
+		  display_out       => display,
+		  stack_pointer_out => stack_pointer,
+		                 
+		  -- ALU bus lines  
+		  alu_op1_out       => alu_op1,  
+		  alu_op2_out       => alu_op2,
+		  alu_opcode_out    => alu_opcode, 
+		  alu_flags_in      => alu_flags,
+		  alu_res_in        => alu_res
     );	                
 	
 	--------------------------------------------------------------------------
@@ -187,6 +192,7 @@ begin
 		clk_in             => clk_in,
 		rst_in             => rst_internal,    
 		program_enab_in    => program_enab_in,		
+		stack_pointer_in   => stack_pointer,
 		
 		-- Instruction ROM control lines
 		instr_rom_addr_out => rom_addr,
@@ -199,8 +205,7 @@ begin
 		ram_wr_enab_out    => ram_wr_enab,
 		
 		-- ALU control lines
-		alu_opcode_out    => alu_opcode,
-		alu_flags_in      => alu_flags
+		alu_flags_in       => alu_flags
 	);
 	
 	--------------------------------------------------------------------------
