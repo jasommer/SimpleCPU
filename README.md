@@ -38,7 +38,7 @@ simple as possible while still beeing useful. This was achieved by the following
 2  XORs<br/>
 <br/>
 ## Place an Route results on the Spartan 6 xc6slx9 FPGA
-Maximum frequency: 180 MHz
+Maximum frequency: 180 MHz <br/>
 Number of Slice Registers: 212<br/>
 Number of Slice LUTs:      498<br/>
 Number of RAMB16BWERs:     6<br/>
