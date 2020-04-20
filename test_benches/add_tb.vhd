@@ -19,10 +19,10 @@
 	LIBRARY ieee;
 	USE ieee.std_logic_1164.ALL;
 
-	ENTITY top_level_tb IS
-	END top_level_tb;
+	ENTITY add_tb IS
+	END add_tb;
 
-	ARCHITECTURE behavior OF top_level_tb IS 
+	ARCHITECTURE behavior OF add_tb IS 
 
 	-- Component Declaration for the Unit Under Test (UUT)
 
