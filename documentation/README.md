@@ -17,7 +17,7 @@
 <br>
 <br>
 
-| opcode | Mnemonic  | Explanation                                                                                       |
+| opcode (hex) | Mnemonic  | Explanation                                                                                       |
 |--------|-----------|---------------------------------------------------------------------------------------------------|
 | 0      | NOP       | No Operation                                                                                      |
 | 1      | RS-Vf     | Save 7 bit value to RAM at follow-up address                                                      |
