@@ -17,40 +17,39 @@
 <br>
 <br>
 
-| Opcode        | Mnemonic      | Explanation      |
-| ------------- |:-------------:| :-------------:| 
-|0	|NOP	|No Operation
-|1	|RS-Vf	|Save 7 bit value to RAM at follow-up address                                            |
-|2	|RS-Af	|Save the follow-up value to 7 bit RAM address                                            |
-|3	|RS-ff	|Save 12 bit follow-up value to 12-bit follow-up address                                 |
-|4	|RC-Af	|Copy value from 7 bit address1 to follow up address2                                    |
-|5	|RC-fA	|Copy value from follow-up address1 to 7 bit address2                                    |
-|6	|RC-ff	|Copy value from follow-up address to follow-up address                                  |
-|7	|JP	    |Direct Jump. Set instruction counter to 7 bit value                                     |
-|8	|JP-f	|Direct Jump. Set instruction counter to 12 bit follow-up value                          |
-|9	|JPE	|Direct Jump. If OP1 = OP2, set instruction counter to 7 bit value                       |
-|A	|JPE-f	|Direct Jump. If OP1 = OP2, set instruction counter to 12 bit follow-up value            |
-|B	|JR     |Relative jump. Add  7 bit value to instruction counter                                  |
-|C	|JRE	|Relative jump. If OP1 = OP2, add  7 bit value to instruction counter                    |
-|D	|UNDEFINED| N/A	                                                                                 |
-|E	|UNDEFINED| N/A                                                                                  | 
-|F	|ADD	|OP1+OP2                                                                                 | 
-|10	|SUB	|OP1-OP2                                                                                 | 
-|11	|LSFT	|OP1<<1 (arithmetic)                                                                     | 
-|12	|RSFT	|OP1<<1 (arithmetic)                                                                     | 
-|13	|AND	|OP1 AND OP2                                                                                 | 
-|14	|OR	    |OP1 OR OP2                                                                                 | 
-|15	|XOR	|OP1 XOR OP2                                                                                 | 
-|16	|NAND	|NOT(OP1 AND OP2)                                                                              | 
-|17	|NOR	|NOT(OP1 OR OP2)                                                                              | 
-|18	|INCR	|OP1+1                                                                                   | 
-|19	|DECR	|OP1-1                                                                                   | 
-|1A	|NOT	|NOT OP1                                                                                    | 
-|1B	|BGR	|returns 1 if OP1>OP2 else 0                                                                                | 
-1C	|ABS	|Absolute(OP1)                                                                                   | 
-1D	|L-LSFT	|OP1<<1 (logical)                                                                        | 
-1E	|L-RSFT	|OP1>>1 (logical)                                                                        | 
-1F	|HALT	|Stops the program                                                                       |
-
+| opcode | Mnemonic  | Explanation                                                                                       |
+|--------|-----------|---------------------------------------------------------------------------------------------------|
+| 0      | NOP       | No Operation                                                                                      |
+| 1      | RS-Vf     | Save 7 bit value to RAM at follow-up address                                                      |
+| 2      | RS-Af     | Save the 12 bit follow-up value to 7 bit RAM address                                              |
+| 3      | RS-ff     | Save 12 bit follow-up value to 12-bit follow-up address                                           |
+| 4      | RS-Vif    | Save 7 bit value to RAM at follow-up pointer address                                              |
+| 5      | RS-iAf    | Save the 12 bit follow-up value to 7 bit pointer address                                          |
+| 6      | RS-iff    | Save the 12 bit follow-up value to 12 bit follow-up pointer address                               |
+| 7      | RC-Af     | Copy value from 7 bit address1 to follow up address2                                              |
+| 8      | RC-fA     | Copy value from follow-up address1 to 7 bit address2                                              |
+| 9      | RC-ff     | Copy value from follow-up address to follow-up address                                            |
+| A      | RC-iAif   | Copy value from 7 bit pointer to follow up pointer                                                |
+| B      | RC-ifiA   | Copy value from follow-up pinter to 7 bit pointer                                                 |
+| C      | RC-ifif   | Copy value from follow-up pointer to follow-up pointer                                            |
+| D      | JP        | Direct Jump. Set instruction counter to 7 bit value                                               |
+| E      | JP-f      | Direct Jump. Set instruction counter to 12 bit follow-up value                                    |
+| F      | JR        | Relative jump. Add  7 bit value to instruction counter                                            |
+| 10     | JPE       | Direct Jump. If OP1 = OP2, set instruction counter to 7 bit value                                 |
+| 11     | JPE-f     | Direct Jump. If OP1 = OP2, set instruction counter to 12 bit follow-up value                      |
+| 12     | JRE       | Relative jump. If OP1 = OP2, add  7 bit value to instruction counter                              |
+| 13     | JPO       | Direct Jump. If ALU overflow, set instruction counter to 7 bit value                              |
+| 14     | JPO-f     | Direct Jump. If ALU overflow, set instruction counter to 12 bit value                             |
+| 15     | JRO       | Relative jump. If ALU overflow, add  7 bit value to instruction counter                           |
+| 16     | UNDEFINED | N/A                                                                                               |
+| 17     | UNDEFINED | N/A                                                                                               |
+| 18     | UNDEFINED | N/A                                                                                               |
+| 19     | UNDEFINED | N/A                                                                                               |
+| 1A     | UNDEFINED | N/A                                                                                               |
+| 1B     | SSR       | Start subroutine at 7 bit address                                                                 |
+| 1C     | SSR-f     | Start subroutine at 12 bit follow-up address                                                      |
+| 1D     | SSRR      | Start subroutine at relative 7 bit address (subroutine address = current address + 7 bit address) |
+| 1E     | ESR       | escape soubroutine                                                                                |
+| 1F     | HALT      | Stops the program                                                                                 |
 
 ## Functional description
