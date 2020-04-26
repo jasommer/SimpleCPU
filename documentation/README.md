@@ -49,7 +49,7 @@
 | 1B     | SSR       | Start subroutine at 7 bit address                                                                 |
 | 1C     | SSR-f     | Start subroutine at 12 bit follow-up address                                                      |
 | 1D     | SSRR      | Start subroutine at relative 7 bit address (subroutine address = current address + 7 bit address) |
-| 1E     | ESR       | escape soubroutine                                                                                |
+| 1E     | ESR       | escape subroutine                                                                                |
 | 1F     | HALT      | Stops the program                                                                                 |
 
 ## Functional description
