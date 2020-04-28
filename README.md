@@ -1,5 +1,5 @@
 # SimpleCPU
-A simple VHDL implementation of a general purpose 12 bit RISC CPU. This is not a highly complex FPGA project and should not be viewed as such - it is more of an educational attempt to practice and learn.
+A simple, fully synthesizable VHDL implementation of a general purpose 12 bit RISC CPU. This is not a highly complex FPGA project and should not be viewed as such - it is more of an educational attempt to practice and learn.
 
 ## Scope
 As the name implies, the goal of this project was to come up with a processor architecture that is as
