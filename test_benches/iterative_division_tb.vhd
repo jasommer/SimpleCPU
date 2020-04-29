@@ -18,10 +18,10 @@
 	LIBRARY ieee;
 	USE ieee.std_logic_1164.ALL;
 
-	ENTITY interative_division_tb IS
-	END interative_division_tb;
+	ENTITY iterative_division_tb IS
+	END iterative_division_tb;
 
-	ARCHITECTURE behavior OF interative_division_tb IS 
+	ARCHITECTURE behavior OF iterative_division_tb IS 
 
 	-- Component Declaration for the Unit Under Test (UUT)
 
